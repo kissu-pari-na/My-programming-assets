@@ -1,6 +1,5 @@
 #include<bits/stdc++.h>
 using namespace std;
-
 #define SQR(n) (n*n)
 #define CHR getchar()
 #define NL printf("\n")
