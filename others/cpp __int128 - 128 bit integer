@@ -1,0 +1,27 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+__int128 BigMod(__int128 base, __int128 power, __int128 MOD)
+{
+    __int128 ret=1;
+    while(power)
+    {
+        if(power & 1)
+            ret=(ret*base)%MOD;
+        base=(base*base)%MOD;
+        power>>=1;
+    }
+    return ret;
+}
+
+int main() {
+	long long int t , b , p , m , k , res ;
+	scanf("%lld",&t) ;
+	for( k = 1 ; k <= t ; k ++ )
+	{
+		scanf("%lld%lld%lld",&b,&p,&m) ;
+		res = (long long int)BigMod( (__int128)b , (__int128)p , (__int128)m ) ;
+		printf("Case %lld: %lld\n",k,res) ;
+	}
+	return 0;
+}
