@@ -1,0 +1,30 @@
+void Zary( LL ar[] , char S[] )
+{
+    LL left , right , d = strlen( S ) , i ;
+    left = right = 0 ;
+    F( i , 1 , d - 1 )
+    {
+        if( i > right )
+        {
+            left = right = i ;
+            while( i < d && S[right-left] == S[right] ) right ++ ;
+            ar[i] = right - left ;
+            right -- ;
+        }
+        else
+        {
+            LL k = i - left ;
+            if( ar[k] < right - i + 1 )
+            {
+                ar[i] = ar[k] ;
+            }
+            else
+            {
+                left = i ;
+                while( right < d && S[right-left] == S[right] ) right ++ ;
+                ar[i] = right - left ;
+                right -- ;
+            }
+        }
+    }
+}
