@@ -1,0 +1,90 @@
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long LL ;
+
+int n , m ;
+struct info{
+    int id ;
+    LL val ;
+    info() {} ;
+    info( int _id , LL _val ) { id = _id ; val = _val; } ;
+    bool operator < ( const info &p ) const
+    {
+        if( val == p.val ) return id < p.id ;
+        return val > p.val ;
+    }
+}a[30005] ;
+
+struct qry{
+    int l , r , id ;
+    LL x ;
+    qry() {} ;
+    qry( LL _x , int _l , int _r , int _id ) { x = _x ; l = _l ; r = _r ; id = _id ; } ;
+    bool operator < ( const qry &p ) const
+    {
+        if( x == p.x ) return id < p.id ;
+        return x > p.x ;
+    }
+}Q[200005];
+
+int res[200005] ;
+int tree[3*30000] ;
+
+void update( int node , int left , int right , int pos )
+{
+    if( right < pos || left > pos ) return ;
+    if( left >= pos && right <= pos ){ tree[node] = 1 ; return ; }
+    int mid = left + ( ( right - left ) >> 1 ) ;
+    int Lnode = node * 2 ;
+    int Rnode = node * 2 + 1 ;
+    update( Lnode , left , mid , pos ) ;
+    update( Rnode , mid + 1 , right , pos ) ;
+    tree[node] = tree[Lnode] + tree[Rnode] ;
+}
+
+int query( int node , int left , int right , int i , int j )
+{
+    if( right < i || left > j ) return 0 ;
+    if( left >= i && right <= j ) return tree[node] ;
+    int mid = left + ( ( right - left ) >> 1 ) ;
+    int Lnode = node * 2 ;
+    int Rnode = node * 2 + 1 ;
+    return query( Lnode , left , mid , i , j ) + query( Rnode , mid + 1 , right , i , j ) ;
+}
+
+int main()
+{
+    int i , j , k , q ;
+    scanf("%d",&n) ;
+    for( i = 1 ; i <= n ; i ++ )
+    {
+        scanf("%lld",&a[i].val);
+        a[i].id = i ;
+    }
+    sort( a + 1 , a + 1 + n ) ;
+    scanf("%d",&q) ;
+    for( i = 1 ; i <= q ; i ++ )
+    {
+        LL val ;
+        scanf("%d%d",&Q[i].l,&Q[i].r) ;
+        Q[i].id = i ;
+        scanf("%lld",&val);
+        Q[i].x = val ;
+    }
+    sort( Q + 1 , Q + 1 + q ) ;
+    LL pos = 1 ;
+    for( i = 1 ; i <= q ; i ++ )
+    {
+        while( pos <= n && a[pos].val > Q[i].x )
+        {
+            update( 1 , 1 , n , a[pos].id ) ;
+            pos ++ ;
+        }
+        res[Q[i].id] = query( 1 , 1 , n , Q[i].l , Q[i].r ) ;
+    }
+    for( i = 1 ; i <= q ; i ++ )
+    {
+        printf("%d\n",res[i]) ;
+    }
+    return 0;
+}
