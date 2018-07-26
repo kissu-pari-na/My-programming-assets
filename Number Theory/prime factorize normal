@@ -1,0 +1,29 @@
+#include<bits/stdc++.h>
+using namespace std ;
+typedef long long LL ;
+LL Factor[100005] , Sz ;
+void PrimeFactorize( LL val )
+{
+    LL i ;
+    while( val % 2 == 0 ){
+        Sz ++ ; Factor[Sz] = 2 ; val /= 2 ;
+    }
+    for( i = 3 ; i <= sqrt( val ) ; i += 2 ){
+        while( val % i == 0 ){
+            Sz ++ ; Factor[Sz] = i ; val /= i ;
+        }
+    }
+    if( val > 2 ){ Sz ++ ; Factor[Sz] = val ; }
+}
+int main()
+{
+    LL val , i ;
+    scanf("%lld",&val) ;
+    Sz = 0 ;
+    PrimeFactorize( val ) ;
+    for( i = 1 ; i <= Sz ; i ++ ){
+        if( i > 1 ) printf(" ") ;
+        printf("%lld",Factor[i]) ;
+    }
+    return 0 ;
+}
