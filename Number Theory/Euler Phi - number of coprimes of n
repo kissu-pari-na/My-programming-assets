@@ -1,0 +1,33 @@
+#include<bits/stdc++.h>
+using namespace std ;
+typedef long long LL ;
+LL Phi( LL val )
+{
+    LL i , res = val ;
+    if( val % 2 == 0 ){
+        while( val % 2 == 0 ){
+            val /= 2 ;
+        }
+        res -= res / 2 ;
+    }
+    for( i = 3 ; i <= sqrt( val ) ; i += 2 ){
+        if( val % i == 0 ){
+            while( val % i == 0 ){
+                val /= i ;
+            }
+            res -= res / i ;
+        }
+    }
+    if( val > 2 ){ res -= res / val ; }
+    return res ;
+}
+int main()
+{
+    LL val , i ;
+    while( scanf("%lld",&val) && val )
+    {
+        LL res = Phi( val ) ;
+        printf("%lld\n",res) ;
+    }
+    return 0 ;
+}
