@@ -1,4 +1,4 @@
-/** Bellmanford Algorithm **/
+/** Bellmanford Algorithm(Single Source Sortest Path) **/
 
 #include<bits/stdc++.h>
 typedef long long LL ;
