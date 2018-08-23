@@ -1,0 +1,68 @@
+/** Bellmanford Algorithm **/
+
+#include<bits/stdc++.h>
+typedef long long LL ;
+using namespace std ;
+
+#define DBG puts("I am here...")
+
+LL n , m ;
+
+struct edge{
+    LL u , v , w ;
+    edge(){}
+    edge( LL u , LL v , LL w ): u(u) , v(v) , w(w) {}
+};
+
+vector< edge > V ;
+LL dis[100005] ;
+
+LL Bellmanford(){
+    LL i , j ;
+    for( i = 1 ; i <= n ; i ++ ) dis[i] = LLONG_MAX ; dis[1] = 0 ;
+    bool ok = 1 ;
+    for( i = 1 ; i <= n ; i ++ ){
+        for( j = 0 ; j < m ; j ++ ){
+            LL u , v , w ; u = V[j].u ; v = V[j].v ; w = V[j].w ;
+            if( dis[u] + w < dis[v] ){
+                dis[v] = dis[u] + w ;
+                if( i == n ) ok = 0 ;
+            }
+        }
+    }
+    return ok ;
+}
+
+
+int main(){
+    LL i , j ;
+    scanf("%lld %lld",&n,&m) ;
+    for( i = 1 ; i <= m ; i ++ ){
+        LL u , v , w ;
+        scanf("%lld%lld%lld",&u,&v,&w) ;
+        V.push_back( edge( u , v , w ) ) ;
+    }
+    if( Bellmanford( ) ){
+        for( i = 1 ; i <= n ; i ++ ){
+            if( i > 1 ) printf(" ") ;
+            printf("%lld",dis[i]) ;
+        }puts("") ;
+    }
+    else puts("Negative Cycle") ;
+    return 0 ;
+}
+
+/*
+4 5
+
+1 2 10
+1 3 4
+3 2 5
+1 4 4
+4 2 4
+
+3 3
+1 2 3
+2 3 2
+3 1 -10
+*/
