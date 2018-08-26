@@ -1,0 +1,76 @@
+#include<bits/stdc++.h>
+typedef long long LL ;
+using namespace std ;
+
+#define DBG puts("I am here...")
+
+LL n , m , Sz , Id ;
+
+vector< LL > V[2][100005] , res[100005] ;
+bool ck[100005] ;
+LL a[100005] ;
+
+void DFS( LL u , LL id ){
+    LL i , d = V[id][u].size() ;
+    ck[u] = 1 ;
+    if( id ) res[Id].push_back( u ) ;
+    for( i = 0 ; i < d ; i ++ ){
+        LL v = V[id][u][i] ;
+        if( ck[v] == 0 ) DFS( v , id ) ;
+    }
+    if( !id ) a[++Sz] = u ;
+}
+
+void SCC(){
+    LL i , j ;
+    Sz = 0 ;
+    for( i = 1 ; i <= n ; i ++ ){
+        if( !ck[i] ) DFS( i , 0 ) ;
+    }
+    memset( ck , 0 , sizeof( ck ) ) ;
+    Id = 0 ;
+    for( i = Sz ; i >= 1 ; i -- ){
+        if( !ck[a[i]] ){
+            Id ++ ; DFS( a[i] , 1 ) ;
+        }
+    }
+    for( i = 1 ; i <= Id ; i ++ ){
+        LL d = res[i].size() ;
+        for( j = 0 ; j < d ; j ++ ){
+            if( j ) printf(" ") ;
+            printf("%lld",res[i][j]) ;
+        }puts("") ;
+    }
+}
+
+int main(){
+    LL i , j ;
+    scanf("%lld%lld",&n,&m) ;
+    for( i = 1 ; i <= m ; i ++ ){
+        LL u , v ;
+        scanf("%lld%lld",&u,&v) ;
+        V[0][u].push_back( v ) ;
+        V[1][v].push_back( u ) ;
+    }
+    SCC( ) ;
+    return 0 ;
+}
+
+/*
+input:
+7 8
+
+1 2
+2 3
+3 1
+3 4
+4 5
+5 6
+6 7
+7 5
+
+output:
+1 3 2
+4
+5 7 6
+*/
