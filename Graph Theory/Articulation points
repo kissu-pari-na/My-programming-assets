@@ -1,0 +1,66 @@
+#include<bits/stdc++.h>
+using namespace std ;
+typedef long long LL ;
+#define Rep( i , a , b ) for( i = a ; i <= b ; i ++ )
+LL n , m , ti ;
+
+LL back_edge[10004] ;
+LL d[10004] ;
+LL ck[10004] ;
+bool mark[10004] ;
+vector< LL > V[10004] ;
+LL par[10004] ;
+LL child[10004] ;
+
+void DFS( LL u ){
+    ti ++ ;
+    d[u] = back_edge[u] = ti ;
+    LL i , dd = V[u].size() ;
+    ck[u] = 1 ;
+    Rep( i , 0 , dd - 1 ){
+        LL v = V[u][i] ;
+        if( ck[v] == 1 ){
+            if( par[u] != v ){
+                back_edge[u] = min( back_edge[u] , d[v] ) ;
+            }
+        }
+        else if( !ck[v] ){
+            par[v] = u ;
+            child[u] ++ ;
+            DFS( v ) ;
+            if( back_edge[v] >= d[u] ) mark[u] = 1 ;
+            back_edge[u] = min( back_edge[u] , back_edge[v] ) ;
+        }
+    }
+    ti ++ ;
+    ck[u] = 2 ;
+}
+
+int main()
+{
+    LL i , j , t ;
+    while( 1 ){
+        scanf("%lld%lld",&n,&m) ;
+        if( n == 0 && m == 0 ) break ;
+        memset( ck , 0 , sizeof( ck ) ) ;
+        memset( child , 0 , sizeof( child ) ) ;
+        memset( mark , 0 , sizeof( mark ) ) ;
+        Rep( i , 1 , m ){
+            LL u , v ;
+            scanf("%lld%lld",&u,&v) ;
+            V[u].push_back( v ) ;
+            V[v].push_back( u ) ;
+        }
+        ti = 0 ;
+        par[1] = 1 ;
+        DFS( 1 ) ;
+        LL res = 0 ;
+        if( child[1] > 1 ) res = 1 ;
+        Rep( i , 2 , n ){
+            if( mark[i] ) res ++ ;
+        }
+        Rep( i , 1 , n ) V[i].clear() ;
+        printf("%lld\n",res) ;
+    }
+    return 0 ;
+}
