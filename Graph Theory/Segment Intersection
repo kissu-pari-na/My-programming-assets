@@ -1,0 +1,47 @@
+struct point{
+    LL x , y ;
+    point(){}
+    point( LL x , LL y ): x(x) , y(y) {}
+};
+
+struct segment{
+    point l , r ;
+    segment(){}
+    segment( point l , point r ): l(l) , r(r) {}
+} a[1003] ;
+
+LL Orientation( segment s , point p ){
+    LL y , y1 , y2 , x , x1 , x2 ;
+    x = p.x , y = p.y ;
+    x1 = s.l.x , y1 = s.l.y , x2 = s.r.x , y2 = s.r.y ;
+    LL val = ( y - y1 ) * ( x1 - x2 ) - ( x - x1 ) * ( y1 - y2 ) ;
+    if( val < 0 ) return 1 ;
+    if( val > 0 ) return 2 ;
+    return 0 ;
+}
+
+bool OnSegment( segment s , point p ){
+    LL y , y1 , y2 , x , x1 , x2 ;
+    x = p.x , y = p.y ;
+    x1 = s.l.x , y1 = s.l.y , x2 = s.r.x , y2 = s.r.y ;
+    if( x >= min( x1 , x2 ) && x <= max( x1 , x2 ) && y >= min( y1 , y2 ) && y <= max( x1 , x2 ) )
+        return 1 ;
+    return 0 ;
+}
+
+bool DoInterSect( segment s1 , segment s2 ){
+    LL o1 = Orientation( s1 , s2.l ) ;
+    LL o2 = Orientation( s1 , s2.r ) ;
+
+    LL o3 = Orientation( s2 , s1.l ) ;
+    LL o4 = Orientation( s2 , s1.r ) ;
+
+    if( ( o1 != o2 ) && ( o3 != o4 ) ) return 1 ;
+
+    if( !o1 && OnSegment( s1 , s2.l ) ) return 1 ;
+    if( !o2 && OnSegment( s1 , s2.r ) ) return 1 ;
+    if( !o3 && OnSegment( s2 , s1.l ) ) return 1 ;
+    if( !o4 && OnSegment( s2 , s1.r ) ) return 1 ;
+
+    return 0 ;
+}
