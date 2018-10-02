@@ -1,0 +1,97 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define LL long long int
+LL n ;
+
+struct info{
+    LL x , y , z , prop ;
+} tree[400005] ;
+
+void init( LL node , LL left , LL right ){
+    if( left == right ){
+        tree[node].x = 1 ;
+        tree[node].y = 0 ;
+        tree[node].z = 0 ;
+        tree[node].prop = 0 ;
+        return ;
+    }
+    LL mid = left + ( ( right - left ) >> 1 ) ;
+    LL Lnode = ( node << 1 ) ;
+    LL Rnode = ( node << 1 ) + 1 ;
+    init( Lnode , left , mid ) ;
+    init( Rnode , mid + 1 , right ) ;
+    tree[node].x = tree[Lnode].x + tree[Rnode].x ;
+}
+
+void update( LL node , LL left , LL right , LL i , LL j ){
+    if( left >= i && right <= j ){
+        LL tmp = tree[node].x ;
+        tree[node].x = tree[node].z ;
+        tree[node].z = tree[node].y ;
+        tree[node].y = tmp ;
+        tree[node].prop ++ ;
+        tree[node].prop %= 3 ;
+        return ;
+    }
+    if( right < i || left > j ) return ;
+    LL mid = left + ( ( right - left ) >> 1 ) ;
+    LL Lnode = ( node << 1 ) ;
+    LL Rnode = ( node << 1 ) + 1 ;
+    update( Lnode , left , mid , i , j ) ;
+    update( Rnode , mid + 1 , right , i , j ) ;
+    if( tree[node].prop == 0 ){
+        tree[node].x = tree[Lnode].x + tree[Rnode].x ;
+        tree[node].y = tree[Lnode].y + tree[Rnode].y ;
+        tree[node].z = tree[Lnode].z + tree[Rnode].z ;
+    }
+    else if( tree[node].prop == 1 ){
+        tree[node].x = tree[Lnode].z + tree[Rnode].z ;
+        tree[node].y = tree[Lnode].x + tree[Rnode].x ;
+        tree[node].z = tree[Lnode].y + tree[Rnode].y ;
+    }
+    else{
+        tree[node].x = tree[Lnode].y + tree[Rnode].y ;
+        tree[node].y = tree[Lnode].z + tree[Rnode].z ;
+        tree[node].z = tree[Lnode].x + tree[Rnode].x ;
+    }
+}
+
+LL query( LL node , LL left , LL right , LL i , LL j , LL extra ){
+    if( left >= i && right <= j ){
+        LL d = extra % 3 ;
+        if( !d ){
+            return tree[node].x ;
+        }
+        else if( d == 1 ){
+            return tree[node].z ;
+        }
+        else{
+            return tree[node].y ;
+        }
+    }
+    if( right < i || left > j ) return 0LL ;
+    LL mid = left + ( ( right - left ) >> 1 ) ;
+    LL Lnode = ( node << 1 ) ;
+    LL Rnode = ( node << 1 ) + 1 ;
+    LL ret1 = query( Lnode , left , mid , i , j , extra + tree[node].prop ) ;
+    LL ret2 = query( Rnode , mid + 1 , right , i , j , extra + tree[node].prop ) ;
+    return ret1 + ret2 ;
+}
+
+int main()
+{
+    LL i , q , state , L , R ;
+    scanf("%lld%lld",&n,&q) ;
+    init( 1 , 1 , n ) ;
+    for( i = 1 ; i <= q ; i ++ ){
+        scanf("%lld%lld%lld",&state,&L,&R) ;
+        L ++ , R ++ ;
+        if( !state ){
+            update( 1 , 1 , n , L , R ) ;
+        }
+        else{
+            printf("%lld\n",query( 1 , 1 , n , L , R , 0LL )) ;
+        }
+    }
+    return 0 ;
+}
