@@ -1,0 +1,82 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define LL long long int
+LL n ;
+
+bool visit[1003][1003][3] ;
+LL dp[1003][1003][3] ;
+vector< LL > res ;
+char s[2][1003] ;
+
+bool Fun( LL x , LL y , LL state ){
+    if( x == n + 1 && y == n + 1 ){
+        return dp[x][y][state] = 1 ;
+    }
+    if( visit[x][y][state] ) return dp[x][y][state] ;
+    LL ret1 = 0 , ret2 = 0 ;
+    if( state == 2 ){
+        if( x <= n ){
+            ret1 = Fun( x + 1 , y , s[0][x] - '0' ) ;
+        }
+        if( y <= n ){
+            ret2 = Fun( x , y + 1 , s[1][y] - '0' ) ;
+        }
+    }
+    else{
+        if( x <= n && ( ( state == 1 && s[0][x] - '0' == 0 ) || ( state == 0 && s[0][x] - '0' == 1 ) ) ){
+            ret1 = Fun( x + 1 , y , 2 ) ;
+        }
+        if( y <= n && ( ( state == 1 && s[1][y] - '0' == 0 ) || ( state == 0 && s[1][y] - '0' == 1 ) ) ){
+            ret2 = Fun( x , y + 1 , 2 ) ;
+        }
+    }
+    visit[x][y][state] = 1 ;
+    return dp[x][y][state] = ret1 | ret2 ;
+}
+
+void PrintSol( LL x , LL y , LL state ){
+    if( x == n + 1 && y == n + 1 ){
+        return ;
+    }
+    if( state == 2 ){
+        if( x <= n && dp[x+1][y][s[0][x] - '0'] ){
+            res.push_back( 1LL ) ;
+            PrintSol( x + 1 , y , s[0][x] - '0' ) ;
+        }
+        else if( y <= n && dp[x][y+1][s[1][y] - '0'] ){
+            res.push_back( 2LL ) ;
+            PrintSol( x , y + 1 , s[1][y] - '0' ) ;
+        }
+    }
+    else{
+        if( x <= n && ( ( state == 1 && s[0][x] - '0' == 0 ) || ( state == 0 && s[0][x] - '0' == 1 ) ) && dp[x+1][y][2] ){
+            res.push_back( 1LL ) ;
+            PrintSol( x + 1 , y , 2 ) ;
+        }
+        else if( y <= n && ( ( state == 1 && s[1][y] - '0' == 0 ) || ( state == 0 && s[1][y] - '0' == 1 ) ) && dp[x][y+1][2] ){
+            res.push_back( 2LL ) ;
+            PrintSol( x , y + 1 , 2 ) ;
+        }
+    }
+}
+
+
+int main()
+{
+    LL i , j ;
+    scanf("%lld",&n) ;
+    for( j = 0 ; j <= 1 ; j ++ ){
+        scanf("%s",&s[j]) ;
+        for( i = n ; i >= 1 ; i -- ) s[j][i] = s[j][i-1] ;
+    }
+    if( Fun( 1 , 1 , 2 ) ){
+        PrintSol( 1 , 1 , 2 ) ;
+        LL d = res.size() ;
+        for( i = 0 ; i < d ; i ++ ){
+            printf("%lld",res[i]) ;
+        }
+        puts("") ;
+    }
+    else puts("Impossible") ;
+    return 0 ;
+}
