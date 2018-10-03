@@ -1,0 +1,62 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define LL long long int
+LL n , caseno ;
+
+struct info{
+    LL x , y , z ;
+} a[31] ;
+
+LL visit[31][1003] ;
+LL dp[31][1003] ;
+vector< LL > res ;
+
+LL Fun( LL pos , LL baki ){
+    if( pos == n + 1 ) return 0LL ;
+    if( visit[pos][baki] == caseno ) return dp[pos][baki] ;
+    LL ret1 = 0 , ret2 = 0 ;
+    if( baki >= a[pos].z ) ret1 = a[pos].y + Fun( pos + 1 , baki - a[pos].z ) ;
+    ret2 = Fun( pos + 1 , baki ) ;
+    visit[pos][baki] = caseno ;
+    return dp[pos][baki] = max( ret1 , ret2 ) ;
+}
+void PrintLIS( LL pos , LL baki ){
+    if( pos == n + 1 ) return ;
+    if( baki >= a[pos].z ){
+        if( a[pos].y + dp[pos+1][baki-a[pos].z] >= dp[pos+1][baki] ){
+            res.push_back( pos ) ;
+            PrintLIS( pos + 1 , baki - a[pos].z ) ;
+        }
+        else{
+            PrintLIS( pos + 1 , baki ) ;
+        }
+    }
+    else PrintLIS( pos + 1 , baki ) ;
+}
+
+int main()
+{
+    LL i , t , w;
+    caseno = 1 ;
+    while( scanf("%lld",&t) != EOF ){
+        if( caseno > 1 ) puts("") ;
+        scanf("%lld",&w) ;
+        scanf("%lld",&n) ;
+        for( i = 1 ; i <= n ; i ++ ){
+            scanf("%lld%lld",&a[i].x,&a[i].y) ;
+            a[i].z = 3LL * w * a[i].x ;
+        }
+        printf("%lld\n",Fun( 1 , t )) ;
+        PrintLIS( 1 , t ) ;
+        caseno ++ ;
+        LL d = res.size() ;
+        if( d ){
+            printf("%lld\n",d) ;
+            for( i = 0 ; i < d ; i ++ ){
+                printf("%lld %lld\n",a[res[i]].x,a[res[i]].y) ;
+            }
+        }
+        res.clear() ;
+    }
+    return 0 ;
+}
