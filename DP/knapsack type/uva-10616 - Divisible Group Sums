@@ -1,0 +1,38 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define LL long long int
+int n , m , d , caseno ;
+
+int visit[201][11][20][21] ;
+LL dp[201][11][20][21] ;
+int a[201] ;
+
+LL Fun( int pos , int baki , int extra , int koto ){
+    if( pos == n + 1 ){
+        if( !baki && !extra ) return 1 ;
+        return 0 ;
+    }
+    if( visit[pos][baki][extra][koto] == caseno ) return dp[pos][baki][extra][koto] ;
+    LL ret1 = 0 , ret2 = 0 ;
+    if( baki ) ret1 = Fun( pos + 1 , baki - 1 , ( ( ( extra + a[pos] ) % d ) + d ) % d , koto ) ;
+    ret2 = Fun( pos + 1 , baki , extra , koto ) ;
+    visit[pos][baki][extra][koto] = caseno ;
+    return dp[pos][baki][extra][koto] = ret1 + ret2 ;
+}
+
+int main()
+{
+    int i , j , q ;
+    caseno = 0 ;
+    while( ++caseno ){
+        scanf("%d%d",&n,&q) ;
+        if( n == 0 && q == 0 ) break ;
+        for( i = 1 ; i <= n ; i ++ ) scanf("%d",&a[i]) ;
+        printf("SET %d:\n",caseno) ;
+        for( i = 1 ; i <= q ; i ++ ){
+            scanf("%d%d",&d,&m) ;
+            printf("QUERY %d: %lld\n",i,Fun( 1 , m , 0 , d )) ;
+        }
+    }
+    return 0 ;
+}
