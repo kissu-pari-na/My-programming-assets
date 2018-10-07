@@ -1,0 +1,45 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define LL long long
+LL n , m , caseno ;
+LL visit[102] ;
+pair< LL , LL > dp[102] ;
+vector< LL > V[102] ;
+
+pair< LL , LL > Fun( LL pos ){
+    LL i , d = V[pos].size() ;
+    if( !d ){
+        return make_pair( 0LL , pos ) ;
+    }
+    if( visit[pos] == caseno ) return dp[pos] ;
+    pair< LL , LL > ret = make_pair( 0LL , 0 ) ;
+    for( i = 0 ; i < d ; i ++ ){
+        LL v = V[pos][i] ;
+        pair< LL , LL > tmp = Fun( v ) ;
+        if( 1LL + tmp.first > ret.first ){
+            ret = make_pair( tmp.first + 1 , tmp.second ) ;
+        }
+        else if( 1LL + tmp.first == ret.first ){
+            ret = make_pair( ret.first , min( ret.second , tmp.second ) ) ;
+        }
+    }
+    visit[pos] = caseno ;
+    return dp[pos] = ret ;
+}
+
+int main()
+{
+    LL i , s ;
+    while( scanf("%lld",&n) && n ){
+        caseno ++ ;
+        scanf("%lld",&s) ;
+        LL u , v ;
+        while( scanf("%lld%lld",&u,&v) && ( u != 0 || v != 0 ) ){
+            V[u].push_back( v ) ;
+        }
+        pair< LL , LL > res = Fun( s ) ;
+        printf("Case %lld: The longest path from %lld has length %lld, finishing at %lld.\n\n",caseno,s,res.first,res.second) ;
+        for( i = 1 ; i <= n ; i ++ ) V[i].clear() ;
+    }
+    return 0 ;
+}
