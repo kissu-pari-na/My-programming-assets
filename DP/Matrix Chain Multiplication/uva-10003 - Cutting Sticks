@@ -1,0 +1,35 @@
+#include<bits/stdc++.h>
+using namespace std ;
+#define LL long long
+#define Rep( i , l , r ) for( i = l ; i <= r ; i ++ )
+
+LL a[55] , n , caseno ;
+LL visit[55][55] ;
+LL dp[55][55] ;
+
+LL MCM( LL lp , LL rp ){
+    LL i ;
+    if( lp + 1 == rp ) return 0 ;
+    if( visit[lp][rp] == caseno ) return dp[lp][rp] ;
+    LL ret = LLONG_MAX ;
+    Rep( i , lp + 1 , rp - 1 ){
+        ret = min( ret , a[rp] - a[lp] + MCM( lp , i ) + MCM( i , rp ) ) ;
+    }
+    visit[lp][rp] = caseno ;
+    return dp[lp][rp] = ret ;
+}
+
+int main(){
+    LL i , l ;
+    caseno = 0 ;
+    while( scanf("%lld",&l) && l ){
+        caseno ++ ;
+        scanf("%lld",&n) ;
+        n += 2 ;
+        a[1] = 0 ;
+        a[n] = l ;
+        Rep( i , 2 , n - 1 ) scanf("%lld",&a[i]) ;
+        printf("The minimum cutting is %lld.\n",MCM( 1 , n )) ;
+    }
+    return 0 ;
+}
