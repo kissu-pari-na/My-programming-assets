@@ -1,0 +1,62 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define LL long long
+LL n , m , caseno ;
+
+vector< LL > res ;
+
+LL visit[1003][1003] ;
+LL dp[1003][1003] ;
+
+struct info{
+    LL x , y , id ;
+    info(){}
+    info( LL x , LL y , LL id ): x(x) , y(y) , id(id) {}
+    bool operator < ( const info &p ) const{
+        if( x == p.x ) return y > p.y ;
+        return x < p.x ;
+    }
+} a[1003] ;
+
+LL LDS( LL last , LL now ){
+    if( now == n + 1 ) return 0 ;
+    if( visit[last][now] == caseno ) return dp[last][now] ;
+    LL ret1 = 0 , ret2 = 0 ;
+    if( a[now].y < a[last].y && a[now].x != a[last].x ) ret1 = 1LL + LDS( now , now + 1 ) ;
+    ret2 = LDS( last , now + 1 ) ;
+    visit[last][now] = caseno ;
+    return dp[last][now] = max( ret1 , ret2 ) ;
+}
+
+void Print( LL last , LL now ){
+    if( now == n + 1 ) return ;
+    if( a[now].y < a[last].y && a[now].x != a[last].x && dp[now][now+1] >= dp[last][now+1] ){
+        res.push_back( a[now].id ) ;
+        Print( now , now + 1 ) ;
+    }
+    else{
+        Print( last , now + 1 ) ;
+    }
+}
+
+int main()
+{
+    LL i , x , y ;
+    caseno = 1 ;
+    n = 0 ;
+    a[n].y = LLONG_MAX ;
+    while( scanf("%lld%lld",&x,&y) != EOF ){
+        n ++ ;
+        a[n] = info( x , y , n ) ;
+    }
+    sort( a + 1 , a + 1 + n ) ;
+    LDS( 0 , 1 ) ;
+    Print( 0 , 1 ) ;
+    n = res.size() ;
+    printf("%lld\n",n) ;
+    for( i = 0 ; i < n ; i ++ ){
+        printf("%lld\n",res[i]) ;
+    }
+
+    return 0 ;
+}
