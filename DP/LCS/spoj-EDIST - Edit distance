@@ -1,0 +1,41 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define LL long long
+LL n , m , caseno ;
+
+char s[3][2003] ;
+LL visit[2003][2003] ;
+LL dp[2003][2003] ;
+
+LL LCS( LL pos1 , LL pos2 ){
+    if( pos1 == n && pos2 == m ) return 0LL ;
+    if( pos1 == n ) return m - pos2 ;
+    if( pos2 == m ) return n - pos1 ;
+    if( visit[pos1][pos2] == caseno ) return dp[pos1][pos2] ;
+    LL ret = LLONG_MAX ;
+    if( s[1][pos1] == s[2][pos2] ){
+        ret = LCS( pos1 + 1 , pos2 + 1 ) ;
+    }
+    else{
+        ret = min( ret , 1LL + LCS( pos1 , pos2 + 1 ) ) ;
+        ret = min( ret , 1LL + LCS( pos1 + 1 , pos2 + 1 ) ) ;
+        ret = min( ret , 1LL + LCS( pos1 + 1 , pos2 ) ) ;
+    }
+    visit[pos1][pos2] = caseno ;
+    return dp[pos1][pos2] = ret ;
+}
+
+int main()
+{
+    LL i , t ;
+
+    scanf("%lld",&t) ;
+    for( caseno = 1 ; caseno <= t ; caseno ++ ){
+        for( i = 1 ; i <= 2 ; i ++ ) scanf("%s",&s[i]) ;
+        n = strlen( s[1] ) ;
+        m = strlen( s[2] ) ;
+        printf("%lld\n",LCS( 0 , 0 )) ;
+    }
+
+    return 0 ;
+}
