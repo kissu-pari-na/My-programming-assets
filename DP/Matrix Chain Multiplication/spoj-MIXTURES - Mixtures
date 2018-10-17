@@ -1,0 +1,35 @@
+#include<bits/stdc++.h>
+using namespace std ;
+#define LL long long
+#define Rep( i , s , e ) for( i = s ; i <= e ; i ++ )
+
+LL n , caseno ;
+LL visit[102][102] ;
+LL dp[102][102] ;
+LL a[102] ;
+
+LL Fun( LL l , LL r ){
+    LL i ;
+    if( l == r ) return 0LL ;
+    if( visit[l][r] == caseno ) return dp[l][r] ;
+    LL ret = LLONG_MAX ;
+    Rep( i , l , r - 1 ){
+        ret = min( ret , ( ( ( a[i] - a[l-1] ) % 100 ) * ( ( a[r] - a[i] ) % 100 ) ) + Fun( l , i ) + Fun( i + 1 , r ) ) ;
+    }
+    visit[l][r] = caseno ;
+    return dp[l][r] = ret ;
+}
+
+int main(){
+    LL i ;
+    caseno = 0 ;
+    while( scanf("%lld",&n) != EOF ){
+        caseno ++ ;
+        Rep( i , 1 , n ){
+            scanf("%lld",&a[i]) ;
+        }
+        Rep( i , 1 , n ) a[i] += a[i-1] ;
+        printf("%lld\n",Fun( 1 , n )) ;
+    }
+    return 0 ;
+}
