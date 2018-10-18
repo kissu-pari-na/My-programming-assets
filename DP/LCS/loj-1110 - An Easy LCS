@@ -1,0 +1,55 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define LL long long
+LL n , m , caseno ;
+
+char s[3][102] ;
+LL visit[102][102] ;
+string dp[102][102] ;
+
+string LCS( LL pos1 , LL pos2 ){
+    if( pos1 == n && pos2 == m ) return "" ;
+    if( visit[pos1][pos2] == caseno ) return dp[pos1][pos2] ;
+    string ret0 , ret1 , ret2 ;
+    ret0 = ret1 = ret2 = "" ;
+    if( pos1 < n && pos2 < m && s[1][pos1] == s[2][pos2] ){
+        ret0 += ( s[1][pos1] + LCS( pos1 + 1 , pos2 + 1 ) ) ;
+        dp[pos1][pos2] = ret0 ;
+    }
+    else{
+        if( pos1 < n ) ret1 += LCS( pos1 + 1 , pos2 ) ;
+        if( pos2 < m ) ret2 += LCS( pos1 , pos2 + 1 ) ;
+        if( ret1.size() == ret2.size() ) dp[pos1][pos2] = min( ret1 , ret2 ) ;
+        else dp[pos1][pos2] = ret1.size() > ret2.size() ? ret1 : ret2 ;
+    }
+    visit[pos1][pos2] = caseno ;
+    return dp[pos1][pos2] ;
+}
+
+int main()
+{
+    LL i , t ;
+    //freopen("in.txt","r",stdin) , freopen("out.txt","w",stdout) ;
+
+    scanf("%lld",&t) ;
+    for( caseno = 1 ; caseno <= t ; caseno ++ ){
+        scanf("%s%s",&s[1],&s[2]) ;
+        n = strlen( s[1] ) ;
+        m = strlen( s[2] ) ;
+        string res = LCS( 0 , 0 ) ;
+        printf("Case %lld: ",caseno) ;
+        if( !res.size() ) puts(":(") ;
+        else{
+            for( i = 0 ; i < res.size() ; i ++ ) printf("%c",res[i]) ;
+            puts("") ;
+        }
+    }
+
+    return 0 ;
+}
+
+/*
+1
+antagonistic
+happening
+*/
