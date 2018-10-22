@@ -1,0 +1,65 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define LL long long
+#define Rep( i , a , b ) for( i = a ; i <= b ; i ++ )
+
+bool Check( int val , int pos ){
+    return bool ( val & ( 1 << pos ) ) ;
+}
+
+int Set( int val , int pos ){
+    return val | ( 1 << pos ) ;
+}
+int Reset( int val , int pos ){
+    return val & ( ~ ( 1 << pos ) ) ;
+}
+int Flip( int val , int pos ){
+    return val ^ ( 1 << pos ) ;
+}
+
+LL n , m , caseno ;
+
+LL a[16] ;
+LL visit[(1<<16)+2] ;
+bool dp[(1<<16)+2] ;
+
+bool BitMask( LL mask ){
+    LL i , x = LLONG_MIN ;
+    bool ok = 1 ;
+    Rep( i , 0 , n - 1 ){
+        if( !Check( mask , i ) ){
+            if( x > a[i] ){
+                ok = 0 ;
+                break ;
+            }
+            x = a[i] ;
+        }
+    }
+    if( ok ) return 0 ;
+    if( visit[mask] == caseno ) return dp[mask] ;
+    bool ret = 1 ;
+    Rep( i , 0 , n - 1 ){
+        if( !Check( mask , i ) ){
+            ret &= BitMask( Set( mask , i ) ) ;
+        }
+    }
+    visit[mask] = caseno ;
+    return dp[mask] = 1 ^ ret ;
+}
+
+int main()
+{
+    LL t , i , j ;
+    scanf("%lld",&t) ;
+    Rep( caseno , 1 , t ){
+        scanf("%lld",&n) ;
+        Rep( i , 0 , n - 1 ){
+            scanf("%lld",&a[i]) ;
+        }
+        if( BitMask( 0LL ) ){
+            puts("Alice") ;
+        }
+        else puts("Bob") ;
+    }
+    return 0 ;
+}
