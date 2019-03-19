@@ -1,0 +1,56 @@
+#include<bits/stdc++.h>
+using namespace std ;
+#define LL long long
+#define Rep( i , a , b ) for( i = a ; i <= b ; i ++ )
+#define Rev( i , b , a ) for( i = b ; i >= a ; i -- )
+#define PB push_back
+#define mod 1000000007
+
+LL n , m , k ;
+
+vector< LL > nums ;
+map< LL , LL > t ;
+
+LL findMaximumXOR(vector<LL>& nums) {
+        LL max = 0, mask = 0;
+            // mask contains the bits considered so far
+        // search from left to right, find out for each bit is there
+        // two numbers that has different value
+        for (LL i = 31; i >= 0; i--){
+            mask |= (1 << i);
+            t.clear();
+            vector< LL > store ;
+            // and the two prefix, say A and B, satisfies:
+            // store prefix of all number with right i bits discarded
+            for (LL n: nums){
+                t[(mask & n)] ++ ;
+                store.push_back( (mask&n) ) ;
+            }
+
+            // now find out if there are two prefix with different i-th bit
+            // if there is, the new max should be current max with one 1 bit at i-th position, which is candidate
+            // A ^ B = candidate
+            // so we also have A ^ candidate = B or B ^ candidate = A
+            // thus we can use this method to find out if such A and B exists in the set
+            LL candidate = max | (1<<i);
+            for (LL prefix : store){
+                if ( t[(prefix ^ candidate)] ){
+                    max = candidate;
+                    break;
+                }
+
+            }
+        }
+        return max;
+    }
+
+int main()
+{
+    LL i , j , q ;
+    scanf("%lld",&m) ;
+    Rep( i , 1 , m ){
+        LL x ; scanf("%lld",&x) ; nums.push_back( x ) ;
+    }
+    printf("%lld\n",findMaximumXOR( nums )) ;
+    return 0 ;
+}
