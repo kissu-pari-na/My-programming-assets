@@ -1,0 +1,13 @@
+This is a common misconception. Correct it now:
+memset(a, x, sizeof a), does NOT initialize value of a by x.
+Instead it sets each byte of a to x.
+For example, if x = (00000100)_2 = 4, and a is array of ints,
+then calling memset(a, 4, sizeof a) won't make all value of a = 4, but since a is array of intsand int is of 4 bytes,
+so each numer of a will become (00000100 00000100 00000100 00000100)_2 = some big int.
+
+Now, there are special cases for 0 and -1. As repeating 000000 4 times still gives 0 and -1 = (11111111)_2,
+so repeating it 4 or 8 times still gives -1.
+And you can also memset with 1 in boolean array. Because anything not 0 will convert to 1 = true.
+
+If you want to initialize with a large value, then memset with 63 = (00111111)_2 or 127 = (01111111)_2.
+As repeating them 4 times still give a large positive value.
