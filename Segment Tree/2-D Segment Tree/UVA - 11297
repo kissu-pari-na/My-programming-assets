@@ -1,0 +1,149 @@
+#include<bits/stdc++.h>
+using namespace std ;
+#define LL long long
+#define Rep( i , a , b ) for( i = a ; i <= b ; i ++ )
+#define Rev( i , b , a ) for( i = b ; i >= a ; i -- )
+#define PB push_back
+#define mod 1000000007
+
+LL n , m , k , t , caseno ;
+
+pair< LL , LL > tree[4*505][4*505] ;
+LL a[505][505] ;
+char s[5] ;
+
+void build_y( LL nodex , LL nodey , LL lx , LL rx , LL ly , LL ry ){
+    if( ly == ry ){
+        if( lx == rx ){
+            tree[nodex][nodey] = { a[lx][ly] , a[lx][ly] } ;
+        }
+        else{
+            tree[nodex][nodey].first = min( tree[nodex*2][nodey].first , tree[nodex*2+1][nodey].first ) ;
+            tree[nodex][nodey].second = max( tree[nodex*2][nodey].second , tree[nodex*2+1][nodey].second ) ;
+        }
+    }
+    else{
+        LL mid = ly + ( ( ry - ly ) >> 1 ) ;
+        build_y( nodex , nodey * 2 , lx , rx , ly , mid ) ;
+        build_y( nodex , nodey * 2 + 1 , lx , rx , mid + 1 , ry ) ;
+        tree[nodex][nodey].first = min( tree[nodex][nodey*2].first , tree[nodex][nodey*2+1].first ) ;
+        tree[nodex][nodey].second = max( tree[nodex][nodey*2].second , tree[nodex][nodey*2+1].second ) ;
+    }
+}
+void build_x( LL nodex , LL lx , LL rx ){
+    if( lx != rx ){
+        LL mid = lx + ( ( rx - lx ) >> 1 ) ;
+        build_x( nodex * 2 , lx , mid ) ;
+        build_x( nodex * 2 + 1 , mid + 1 , rx ) ;
+    }
+    build_y( nodex , 1 , lx , rx , 1 , n ) ;
+}
+
+void update_y( LL nodex , LL nodey , LL lx , LL rx , LL ly , LL ry , LL posy , LL val ){
+    if( ly == ry ){
+        if( lx == rx ){
+            tree[nodex][nodey] = { val , val } ;
+        }
+        else{
+            tree[nodex][nodey].first = min( tree[nodex*2][nodey].first , tree[nodex*2+1][nodey].first ) ;
+            tree[nodex][nodey].second = max( tree[nodex*2][nodey].second , tree[nodex*2+1][nodey].second ) ;
+        }
+    }
+    else{
+        LL mid = ly + ( ( ry - ly ) >> 1 ) ;
+        if( mid >= posy ){
+            update_y( nodex , nodey * 2 , lx , rx , ly , mid , posy , val ) ;
+        }
+        else{
+            update_y( nodex , nodey * 2 + 1 , lx , rx , mid + 1 , ry , posy , val ) ;
+        }
+        tree[nodex][nodey].first = min( tree[nodex][nodey*2].first , tree[nodex][nodey*2+1].first ) ;
+        tree[nodex][nodey].second = max( tree[nodex][nodey*2].second , tree[nodex][nodey*2+1].second ) ;
+    }
+}
+void update_x( LL nodex , LL lx , LL rx , LL posx , LL posy , LL val ){
+    if( lx != rx ){
+        LL mid = lx + ( ( rx - lx ) >> 1 ) ;
+        if( mid >= posx ){
+            update_x( nodex * 2 , lx , mid , posx , posy , val ) ;
+        }
+        else{
+            update_x( nodex * 2 + 1 , mid + 1 , rx , posx , posy , val ) ;
+        }
+    }
+    update_y( nodex , 1 , lx , rx , 1 , n , posy , val ) ;
+}
+
+
+pair< LL , LL > query_y( LL nodex , LL nodey , LL ly , LL ry , LL iy , LL jy ){
+    if( ly >= iy && ry <= jy ){
+        return tree[nodex][nodey] ;
+    }
+    LL mid = ly + ( ( ry - ly ) >> 1 ) ;
+    if( mid >= jy ){
+        return query_y( nodex , nodey * 2 , ly , mid , iy , jy ) ;
+    }
+    else if( mid < iy ){
+        return query_y( nodex , nodey * 2 + 1 , mid + 1 , ry , iy , jy ) ;
+    }
+    else{
+        pair< LL , LL > tmp1 = query_y( nodex , nodey * 2 , ly , mid , iy , jy ) ;
+        pair< LL , LL > tmp2 = query_y( nodex , nodey * 2 + 1 , mid + 1 , ry , iy , jy ) ;
+        return { min( tmp1.first , tmp2.first ) , max( tmp1.second , tmp2.second ) } ;
+    }
+}
+pair< LL , LL > query_x( LL nodex , LL lx , LL rx , LL ix , LL jx , LL iy , LL jy ){
+    if( lx >= ix && rx <= jx ){
+        return query_y( nodex , 1 , 1 , n , iy , jy ) ;
+    }
+    LL mid = lx + ( ( rx - lx ) >> 1 ) ;
+    if( mid >= jx ){
+        return query_x( nodex * 2 , lx , mid , ix , jx , iy , jy ) ;
+    }
+    else if( mid < ix ){
+        return query_x( nodex * 2 + 1 , mid + 1 , rx , ix , jx , iy , jy ) ;
+    }
+    else{
+        pair< LL , LL > tmp1 = query_x( nodex * 2 , lx , mid , ix , jx , iy , jy ) ;
+        pair< LL , LL > tmp2 = query_x( nodex * 2 + 1 , mid + 1 , rx , ix , jx , iy , jy ) ;
+        return { min( tmp1.first , tmp2.first ) , max( tmp1.second , tmp2.second ) } ;
+    }
+}
+
+//Please Check all of your variables carefully( n , m )
+//...
+int main()
+{
+    //freopen( "input.txt" , "r" , stdin ) ;
+    //freopen( "output.txt" , "w" , stdout ) ;
+    LL i , j , q ;
+    scanf("%lld",&n) ;
+    Rep( i , 1 , n ){
+        Rep( j , 1 , n ){
+            scanf("%lld",&a[i][j]) ;
+        }
+    }
+    build_x( 1 , 1 , n ) ;
+    scanf("%lld",&q) ;
+    Rep( i , 1 , q ){
+        scanf("%s",&s) ;
+        if( s[0] == 'c' ){
+            LL x , y , val ;
+            scanf("%lld%lld%lld",&x,&y,&val) ;
+            update_x( 1 , 1 , n , x , y , val ) ;
+        }
+        else{
+            LL x1 , y1 , x2 , y2 ;
+            scanf("%lld%lld%lld%lld",&x1,&y1,&x2,&y2) ;
+            pair< LL , LL > res = query_x( 1 , 1 , n , x1 , x2 , y1 , y2 ) ;
+            printf("%lld %lld\n",res.second,res.first) ;
+        }
+    }
+    return 0 ;
+}
+
+/** Custom Input **/
+
+/*
+
+*/
