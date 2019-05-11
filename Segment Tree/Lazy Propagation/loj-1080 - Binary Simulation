@@ -1,0 +1,131 @@
+#include<bits/stdc++.h>
+using namespace std ;
+#define LL long long
+#define Rep( i , a , b ) for( i = a ; i <= b ; i ++ )
+#define Rev( i , b , a ) for( i = b ; i >= a ; i -- )
+#define PB push_back
+#define mod 1000000007
+
+LL n , m , k , t , caseno ;
+
+char s[100005] ;
+LL a[100005] ;
+
+struct info{
+    LL one , zero , flip , ans ;
+}tree[4*100005];
+
+void build( LL node , LL left , LL right ){
+    if( left == right ){
+        tree[node].ans = a[left] ;
+        tree[node].one = tree[node].zero = tree[node].flip = 0 ;
+        return ;
+    }
+    LL mid = left + ( ( right - left ) >> 1 ) ;
+    build( node * 2 , left , mid ) ;
+    build( node * 2 + 1 , mid + 1 , right ) ;
+    tree[node].ans = tree[node*2].ans + tree[node*2+1].ans ;
+    tree[node].one = tree[node].zero = tree[node].flip = 0 ;
+}
+
+void Lazy( LL node ){
+    tree[node*2].flip += tree[node].flip ;
+    tree[node*2+1].flip += tree[node].flip ;
+    tree[node].flip = 0 ;
+}
+
+void update( LL node , LL left , LL right , LL i , LL j ){
+    if( left >= i && right <= j ){
+        tree[node].flip ++ ;
+        if( tree[node].flip % 2 ) tree[node].ans = ( right - left + 1 ) - tree[node].ans ;
+        if( left != right ) Lazy( node ) ;
+        tree[node].flip = 0 ;
+        return ;
+    }
+    Lazy( node ) ;
+    LL mid = left + ( ( right - left ) >> 1 ) ;
+    if( mid >= j ){
+        if( tree[node*2+1].flip % 2 ) tree[node*2+1].ans = ( right - mid ) - tree[node*2+1].ans ;
+        if( mid + 1 != right ) Lazy( node*2+1 ) ; tree[node*2+1].flip = 0 ;
+        update( node*2 , left , mid , i , j ) ;
+    }
+    else if( mid < i ){
+        if( tree[node*2].flip % 2 ) tree[node*2].ans = ( mid - left + 1 ) - tree[node*2].ans ;
+        if( left != mid ) Lazy( node*2 ) ; tree[node*2].flip = 0 ;
+        update( node*2+1 , mid + 1 , right , i , j ) ;
+    }
+    else{
+        update( node*2 , left , mid , i , j ) ;
+        update( node*2+1 , mid + 1 , right , i , j ) ;
+    }
+    tree[node].ans = tree[node*2].ans + tree[node*2+1].ans ;
+}
+
+LL query( LL node , LL left , LL right , LL i , LL j ){
+    if( left >= i && right <= j ){
+        if( tree[node].flip % 2 ) tree[node].ans = ( right - left + 1 ) - tree[node].ans ;
+        if( left != right ) Lazy( node ) ; tree[node].flip = 0 ;
+        return tree[node].ans ;
+    }
+    Lazy( node ) ;
+    LL mid = left + ( ( right - left ) >> 1 ) ;
+    LL ret = 0 ;
+    if( mid >= j ){
+        if( tree[node*2+1].flip % 2 ) tree[node*2+1].ans = ( right - mid ) - tree[node*2+1].ans ;
+        if( mid + 1 != right ) Lazy( node*2+1 ) ; tree[node*2+1].flip = 0 ;
+        ret += query( node*2 , left , mid , i , j ) ;
+    }
+    else if( mid < i ){
+        if( tree[node*2].flip % 2 ) tree[node*2].ans = ( mid - left + 1 ) - tree[node*2].ans ;
+        if( left != mid ) Lazy( node*2 ) ; tree[node*2].flip = 0 ;
+        ret += query( node*2+1 , mid + 1 , right , i , j ) ;
+    }
+    else{
+        ret += query( node*2 , left , mid , i , j ) + query( node*2+1 , mid + 1 , right , i , j ) ;
+    }
+    tree[node].ans = tree[node*2].ans + tree[node*2+1].ans ;
+    return ret ;
+}
+
+//Please Check all of your variables carefully( n , m )
+//...
+int main()
+{
+    //freopen( "input.txt" , "r" , stdin ) ;
+    //freopen( "output.txt" , "w" , stdout ) ;
+    LL i , j , q , ask ;
+    scanf("%lld",&t) ;
+    Rep( caseno , 1 , t ){
+        scanf("%s",&s) ;
+        n = strlen( s ) ;
+        Rep( i , 1 , n ){
+            a[i] = s[i-1] - 48 ;
+        }
+        build( 1 , 1 , n ) ;
+        scanf("%lld",&q) ;
+        printf("Case %lld:\n",caseno) ;
+        Rep( i , 1 , q ){
+            LL l , r ;
+            scanf("%s",&s) ;
+            if( s[0] == 'I' ){
+                LL l , r ;
+                scanf("%lld%lld",&l,&r) ;
+                update( 1 , 1 , n , l , r ) ;
+            }
+            else{
+                LL pos ;
+                scanf("%lld",&pos) ;
+                LL res = query( 1 , 1 , n , pos , pos ) ;
+                printf("%lld\n",res) ;
+            }
+        }
+
+    }
+    return 0 ;
+}
+
+/** Custom Input **/
+
+/*
+
+*/
