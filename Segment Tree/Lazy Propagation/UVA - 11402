@@ -1,0 +1,165 @@
+#include<bits/stdc++.h>
+using namespace std ;
+#define LL long long
+#define Rep( i , a , b ) for( i = a ; i <= b ; i ++ )
+#define Rev( i , b , a ) for( i = b ; i >= a ; i -- )
+#define PB push_back
+#define mod 1000000007
+
+LL n , m , k , t , caseno ;
+
+string mask ;
+char s[100005] ;
+LL a[1024006] ;
+
+struct info{
+    LL one , zero , flip , ans ;
+}tree[4*1024006];
+
+void build( LL node , LL left , LL right ){
+    if( left == right ){
+        tree[node].ans = a[left] ;
+        tree[node].one = tree[node].zero = tree[node].flip = 0 ;
+        return ;
+    }
+    LL mid = left + ( ( right - left ) >> 1 ) ;
+    build( node * 2 , left , mid ) ;
+    build( node * 2 + 1 , mid + 1 , right ) ;
+    tree[node].ans = tree[node*2].ans + tree[node*2+1].ans ;
+    tree[node].one = tree[node].zero = tree[node].flip = 0 ;
+}
+
+void Lazy( LL node , LL id , LL left , LL right ){
+    if( id <= 1 ){
+        if( id == 0 ) tree[node].zero = 1 , tree[node].one = 0 , tree[node].flip = 0 ;
+        if( id == 1 ) tree[node].zero = 0 , tree[node].one = 1 , tree[node].flip = 0 ;
+    }
+    if( id == 2 ) tree[node].flip ++ ;
+    if( tree[node].zero ){
+        if( tree[node].flip % 2 ) tree[node].ans = right - left + 1 ; else tree[node].ans = 0 ;
+        if( left != right ){
+            tree[node*2].zero = 1 , tree[node*2].one = 0 , tree[node*2].flip = tree[node].flip ;
+            tree[node*2+1].zero = 1 , tree[node*2+1].one = 0 , tree[node*2+1].flip = tree[node].flip ;
+        }
+        tree[node].one = tree[node].zero = tree[node].flip = 0 ;
+    }
+    else if( tree[node].one ){
+        if( tree[node].flip % 2 == 0 ) tree[node].ans = right - left + 1 ; else tree[node].ans = 0 ;
+        if( left != right ){
+            tree[node*2].zero = 0 , tree[node*2].one = 1 , tree[node*2].flip = tree[node].flip ;
+            tree[node*2+1].zero = 0 , tree[node*2+1].one = 1 , tree[node*2+1].flip = tree[node].flip ;
+        }
+        tree[node].one = tree[node].zero = tree[node].flip = 0 ;
+    }
+    else{
+        if( tree[node].flip % 2 ) tree[node].ans = ( right - left + 1 ) - tree[node].ans ;
+        if( left != right ){
+            tree[node*2].flip += tree[node].flip ;
+            tree[node*2+1].flip += tree[node].flip ;
+        }
+        tree[node].flip = 0 ;
+    }
+}
+
+void update( LL node , LL left , LL right , LL i , LL j , LL id ){
+    if( left >= i && right <= j ){
+        Lazy( node , id , left , right ) ;
+        return ;
+    }
+    Lazy( node , 3LL , left , right ) ;
+    LL mid = left + ( ( right - left ) >> 1 ) ;
+    if( mid >= j ){
+        Lazy( node*2+1 , 3LL , mid + 1 , right ) ;
+        update( node*2 , left , mid , i , j , id ) ;
+    }
+    else if( mid < i ){
+        Lazy( node*2 , 3LL , left , mid ) ;
+        update( node*2+1 , mid + 1 , right , i , j , id ) ;
+    }
+    else{
+        update( node*2 , left , mid , i , j , id ) ;
+        update( node*2+1 , mid + 1 , right , i , j , id ) ;
+    }
+    tree[node].ans = tree[node*2].ans + tree[node*2+1].ans ;
+}
+
+LL query( LL node , LL left , LL right , LL i , LL j ){
+    if( left >= i && right <= j ){
+        Lazy( node , 3LL , left , right ) ;
+        return tree[node].ans ;
+    }
+    Lazy( node , 3LL , left , right ) ;
+    LL mid = left + ( ( right - left ) >> 1 ) ;
+    LL ret = 0 ;
+    if( mid >= j ){
+        Lazy( node*2+1 , 3LL , mid + 1 , right ) ;
+        ret += query( node*2 , left , mid , i , j ) ;
+    }
+    else if( mid < i ){
+        Lazy( node*2 , 3LL , left , mid ) ;
+        ret += query( node*2+1 , mid + 1 , right , i , j ) ;
+    }
+    else{
+        ret += query( node*2 , left , mid , i , j ) + query( node*2+1 , mid + 1 , right , i , j ) ;
+    }
+    tree[node].ans = tree[node*2].ans + tree[node*2+1].ans ;
+    return ret ;
+}
+
+//Please Check all of your variables carefully( n , m )
+//...
+int main()
+{
+    //freopen( "input.txt" , "r" , stdin ) ;
+    //freopen( "output.txt" , "w" , stdout ) ;
+    LL i , j , q , ask ;
+    scanf("%lld",&t) ;
+    Rep( caseno , 1 , t ){
+        scanf("%lld",&m) ;
+        mask = "" ;
+        Rep( j , 1 , m ){
+            LL koyta ;
+            scanf("%lld",&koyta) ;
+            scanf("%s",&s) ;
+            Rep( i , 1 , koyta ){
+                mask += s ;
+            }
+        }
+        n = mask.size() ;
+        Rep( i , 1 , n ){
+            a[i] = mask[i-1] - 48 ;
+        }
+        //cout<< mask<<"\n" ;
+        build( 1 , 1 , n ) ;
+        scanf("%lld",&q) ;
+        ask = 0 ;
+        printf("Case %lld:\n",caseno) ;
+        Rep( i , 1 , q ){
+            LL l , r ;
+            scanf("%s%lld%lld",&s,&l,&r) ;
+            l ++ , r ++ ;
+            if( s[0] == 'F' ){
+                update( 1 , 1 , n , l , r , 1 ) ;
+            }
+            else if( s[0] == 'E' ){
+                update( 1 , 1 , n , l , r , 0 ) ;
+            }
+            else if( s[0] == 'I' ){
+                update( 1 , 1 , n , l , r , 2 ) ;
+            }
+            else{
+                ask ++ ;
+                LL res = query( 1 , 1 , n , l , r ) ;
+                printf("Q%lld: %lld\n",ask,res) ;
+            }
+        }
+
+    }
+    return 0 ;
+}
+
+/** Custom Input **/
+
+/*
+
+*/
