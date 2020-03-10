@@ -1,0 +1,50 @@
+struct Matrix{
+    int n , m ;
+    long long int Mat[2][2] ;
+};
+class Solution {
+    
+Matrix MatMul( Matrix A , Matrix B ){
+    Matrix ret ;
+    ret.n = A.n , ret.m = B.m ;
+    for( int i = 0 ; i < A.n ; i ++ ){
+        for( int j = 0 ; j < B.m ; j ++ ){
+            int tot = 0 ;
+            for( int k = 0 ; k < A.m ; k ++ ){
+                tot += ( A.Mat[i][k] * B.Mat[k][j] ) ;
+            }
+            ret.Mat[i][j] = tot ;
+        }
+    }
+    return ret ;
+}
+
+Matrix MatPower( Matrix Base, int power ){
+    Matrix ret ;
+    ret.n = Base.n , ret.m = Base.m ;
+    ret.Mat[0][0] = 1 ;
+    ret.Mat[0][1] = 0 ;
+    ret.Mat[1][0] = 0 ;
+    ret.Mat[1][1] = 1 ;
+    while(power){
+        if( power & 1 ){
+            ret = MatMul( ret , Base ) ;
+        }
+        Base = MatMul( Base , Base ) ;
+        power /= 2 ;
+    }
+    return ret ;
+}
+public:
+    int climbStairs(int n) {
+        if( n <= 2 ) return n ;
+        Matrix BaseMatrix ;
+        BaseMatrix.n = 2 , BaseMatrix.m = 2 ;
+        BaseMatrix.Mat[0][0] = 1;
+        BaseMatrix.Mat[0][1] = 1;
+        BaseMatrix.Mat[1][0] = 1;
+        BaseMatrix.Mat[1][1] = 0;
+        Matrix NewMatrix = MatPower( BaseMatrix , n - 2 ) ;
+        return NewMatrix.Mat[0][0] * 2 + NewMatrix.Mat[0][1] ;
+    }
+};
